@@ -67,7 +67,7 @@
             animation: glow 2s ease-in-out infinite alternate;
         }
         .particle {
-            position: absolute;
+            position: fixed;
             width: 6px;
             height: 6px;
             border-radius: 50%;
@@ -76,30 +76,32 @@
         }
         .arrow {
             display: none;
-            position: absolute;
+        }
+        .arrow.arrow--visible {
+            display: block;
+            position: fixed;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
             bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
             width: 40px;
             height: 40px;
             cursor: pointer;
             animation: bounce 2s infinite;
-            z-index: 100;
+            z-index: 200;
             background: transparent;
         }
         .congratulation-card {
             display: none;
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
+            position: static;
             width: 80%;
             max-width: 600px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
-            margin: 50px 0;
+            padding-bottom: 110px;
+            margin: 50px auto;
             box-shadow: 0 0 20px rgba(255, 105, 180, 0.3);
             color: white;
             text-align: center;
@@ -118,7 +120,7 @@
         }
         .cloud-img-ready {
             position: absolute;
-            left: 220px;
+            left: 230px;
             top: -40px;
             width: 180px;
             height: 120px;
@@ -172,14 +174,14 @@
       .cloud-img-ready {
         width: 110px;
         height: 70px;
-        left: 130px;
+        left: 140px;
         top: -30px;
       }
     }
     @media (max-width: 600px) {
       body {
-        align-items: flex-start;
-        padding-top: 30px;
+        align-items: center;
+        padding-top: 0;
       }
       .gift-bubble-wrapper {
         width: 150px;
@@ -195,7 +197,7 @@
       .cloud-img-ready {
         width: 70px;
         height: 45px;
-        left: 60px;
+        left: 70px;
         top: -25px;
       }
       .text-container .name {
@@ -218,7 +220,7 @@
 <body>
     <div class="gift-bubble-wrapper">
         <div class="float-group">
-            <img src="img/gift.png" alt="Подарок" class="gift" onclick="showText()">
+            <img src="img/gift.png" alt="Подарок" class="gift">
             <img src="img/cloud.png" alt="cloud" class="cloud-img-ready" id="thoughtBubble">
         </div>
     </div>
@@ -226,9 +228,9 @@
         <div class="name">СОФИЯ</div>
         <div class="birthday-text">HAPPY BIRTHDAY</div>
     </div>
-    <div class="arrow" id="arrow" onclick="scrollToCard()">
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 16L20 26L30 16" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+    <div class="arrow" id="arrow">
+        <svg id="arrowSvg" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path id="arrowPath" d="M10 16L20 26L30 16" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
             <defs>
                 <filter id="glow" x="-10" y="-10" width="60" height="60">
                     <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#fff" flood-opacity="0.8"/>
@@ -243,91 +245,112 @@
     </div>
 
     <script>
-        function createFirework(x, y) {
-            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#ff69b4', '#00ffff', '#ffa500'];
-            const particleCount = 80;
-
-            const container = document.createElement('div');
-            container.style.position = 'absolute';
-            container.style.left = '0';
-            container.style.top = '0';
-            container.style.width = '100%';
-            container.style.height = '100%';
-            container.style.pointerEvents = 'none';
-            document.body.appendChild(container);
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.backgroundColor = color;
-                particle.style.color = color;
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                container.appendChild(particle);
-
-                const angle = (Math.PI * 2 * i) / particleCount;
-                const velocity = 2 + Math.random() * 2;
-                const vx = Math.cos(angle) * velocity;
-                const vy = Math.sin(angle) * velocity;
-
-                let life = 80;
-                function animate() {
-                    if (life <= 0) {
-                        particle.remove();
-                        if (container.children.length === 0) {
-                            container.remove();
-                        }
-                        return;
-                    }
-                    const currentX = parseFloat(particle.style.left);
-                    const currentY = parseFloat(particle.style.top);
-                    particle.style.left = (currentX + vx) + 'px';
-                    particle.style.top = (currentY + vy) + 'px';
-                    particle.style.opacity = life / 80;
-                    life--;
-                    requestAnimationFrame(animate);
-                }
-                animate();
-            }
-        }
-
-        function showText() {
-            const giftBubbleWrapper = document.querySelector('.gift-bubble-wrapper');
+        document.addEventListener('DOMContentLoaded', () => {
             const gift = document.querySelector('.gift');
+            const giftBubbleWrapper = document.querySelector('.gift-bubble-wrapper');
             const textContainer = document.getElementById('textContainer');
             const arrow = document.getElementById('arrow');
-            const thoughtBubble = document.getElementById('thoughtBubble');
-            
-            giftBubbleWrapper.style.display = 'none';
-            textContainer.style.display = 'block';
-            arrow.style.display = 'block';
-            if (thoughtBubble) thoughtBubble.style.display = 'none';
+            const arrowPath = document.getElementById('arrowPath');
+            const congratulationCard = document.getElementById('congratulationCard');
+            let isExploded = false;
+            let isCardOpen = false;
 
-            // Создаем начальные фейерверки
-            for (let i = 0; i < 6; i++) {
-                setTimeout(() => {
+            function createFirework(x, y) {
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#ff69b4', '#00ffff', '#ffa500'];
+                const particleCount = 80;
+
+                const container = document.createElement('div');
+                container.style.position = 'fixed';
+                container.style.left = '0';
+                container.style.top = '0';
+                container.style.width = '100vw';
+                container.style.height = '100vh';
+                container.style.pointerEvents = 'none';
+                document.body.appendChild(container);
+
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.backgroundColor = color;
+                    particle.style.color = color;
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    container.appendChild(particle);
+
+                    const angle = (Math.PI * 2 * i) / particleCount;
+                    const velocity = 2 + Math.random() * 2;
+                    const vx = Math.cos(angle) * velocity;
+                    const vy = Math.sin(angle) * velocity;
+
+                    let life = 80;
+                    function animate() {
+                        if (life <= 0) {
+                            particle.remove();
+                            if (container.children.length === 0) {
+                                container.remove();
+                            }
+                            return;
+                        }
+                        const currentX = parseFloat(particle.style.left);
+                        const currentY = parseFloat(particle.style.top);
+                        particle.style.left = (currentX + vx) + 'px';
+                        particle.style.top = (currentY + vy) + 'px';
+                        particle.style.opacity = life / 80;
+                        life--;
+                        requestAnimationFrame(animate);
+                    }
+                    animate();
+                }
+            }
+
+            function showText() {
+                if (isExploded) return;
+                isExploded = true;
+                
+                giftBubbleWrapper.style.display = 'none';
+                textContainer.style.display = 'block';
+                arrow.classList.add('arrow--visible');
+
+                // Создаем начальные фейерверки
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        createFirework(
+                            Math.random() * window.innerWidth,
+                            Math.random() * window.innerHeight
+                        );
+                    }, i * 300);
+                }
+
+                // Продолжаем создавать фейерверки
+                setInterval(() => {
                     createFirework(
                         Math.random() * window.innerWidth,
                         Math.random() * window.innerHeight
                     );
-                }, i * 300);
+                }, 2000);
             }
 
-            // Продолжаем создавать фейерверки
-            setInterval(() => {
-                createFirework(
-                    Math.random() * window.innerWidth,
-                    Math.random() * window.innerHeight
-                );
-            }, 2000);
-        }
+            function toggleCard() {
+                if (!isCardOpen) {
+                    congratulationCard.style.display = 'block';
+                    congratulationCard.scrollIntoView({ behavior: 'smooth' });
+                    arrowPath.setAttribute('d', 'M10 24L20 14L30 24');
+                } else {
+                    congratulationCard.style.display = 'none';
+                    arrowPath.setAttribute('d', 'M10 16L20 26L30 16');
+                }
+                isCardOpen = !isCardOpen;
+            }
 
-        function scrollToCard() {
-            const card = document.getElementById('congratulationCard');
-            card.style.display = 'block';
-            card.scrollIntoView({ behavior: 'smooth' });
-        }
+            if (gift) {
+                gift.addEventListener('click', showText);
+            }
+
+            if (arrow) {
+                arrow.addEventListener('click', toggleCard);
+            }
+        });
     </script>
 </body>
 </html> 
