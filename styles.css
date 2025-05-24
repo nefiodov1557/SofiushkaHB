@@ -61,4 +61,13 @@ body {
     .birthday-text {
         font-size: 2em;
     }
+}
+
+@media (max-width: 600px) {
+    .congratulation-card {
+        padding-bottom: 170px;
+    }
+    .arrow.arrow--visible {
+        bottom: 70px;
+    }
 } 
