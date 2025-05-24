@@ -1,22 +1,55 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const gift = document.getElementById('gift');
-    const birthdayText = document.getElementById('birthdayText');
+    const gift = document.querySelector('.gift');
     const textContainer = document.querySelector('.text-container');
+    const arrow = document.getElementById('arrow');
+    const congratulationCard = document.getElementById('congratulationCard');
     let isExploded = false;
 
-    // Проверяем, что элементы найдены
-    if (!gift || !birthdayText || !textContainer) {
-        console.error('Не удалось найти необходимые элементы на странице');
-        return;
+    // Оптимизированная функция для создания частиц
+    function createParticle(x, y, color) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.backgroundColor = color;
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        document.body.appendChild(particle);
+
+        // Используем requestAnimationFrame для плавной анимации
+        let opacity = 1;
+        let scale = 1;
+        const animate = () => {
+            if (opacity <= 0) {
+                particle.remove();
+                return;
+            }
+            opacity -= 0.02;
+            scale -= 0.02;
+            particle.style.opacity = opacity;
+            particle.style.transform = `scale(${scale})`;
+            requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
     }
 
     // Обработчик клика по подарку
-    gift.addEventListener('click', () => {
-        console.log('Клик по подарку');
-        if (!isExploded) {
-            isExploded = true;
-            gift.style.display = 'none';
-            textContainer.style.display = 'block';
-        }
-    });
+    if (gift) {
+        gift.addEventListener('click', () => {
+            if (!isExploded) {
+                isExploded = true;
+                gift.style.display = 'none';
+                if (textContainer) textContainer.style.display = 'block';
+                if (arrow) arrow.style.display = 'block';
+            }
+        });
+    }
+
+    // Обработчик клика по стрелке
+    if (arrow) {
+        arrow.addEventListener('click', () => {
+            if (congratulationCard) {
+                congratulationCard.style.display = 'block';
+                congratulationCard.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    }
 }); 
