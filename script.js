@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const arrow = document.getElementById('arrow');
     const congratulationCard = document.getElementById('congratulationCard');
     let isExploded = false;
+    let isCardOpen = false;
+    const arrowPath = document.getElementById('arrow-path');
 
     // Оптимизированная функция для создания частиц
     function createParticle(x, y, color) {
@@ -46,10 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Обработчик клика по стрелке
     if (arrow) {
         arrow.addEventListener('click', () => {
-            if (congratulationCard) {
-                congratulationCard.style.display = 'block';
-                congratulationCard.scrollIntoView({ behavior: 'smooth' });
-            }
+            toggleCard();
         });
+    }
+
+    function toggleCard() {
+        if (!isCardOpen) {
+            congratulationCard.style.display = 'block';
+            arrowPath.setAttribute('d', 'M10 24L20 14L30 24');
+        } else {
+            congratulationCard.style.display = 'none';
+            arrowPath.setAttribute('d', 'M10 16L20 26L30 16');
+        }
+        isCardOpen = !isCardOpen;
     }
 }); 
